@@ -42,31 +42,11 @@ function App() {
     setRegisterMessage(res);
   };
 
-  // const tokenCheck = () => {
-  //   const jwt = localStorage.getItem('jwt')
-
-  //   if(!jwt) {
-  //     return;
-  //   } else {
-  //     return userAuth.getContent(jwt)
-  //       .then(({data}) => {
-  //         setLoggedIn(true);
-  //         setUserData({email: data.email});
-  //         history.push('/');
-  //     })
-  //     .catch(() => {
-  //       console.log('Ошибка')
-  //     })
-  //   }
-  // }
-
   const onLogin = (data) => {
     return userAuth.authorize(data)
       .then(({token: jwt}) => {
         setUserData({email: data.email});
-        console.log(jwt)
         localStorage.setItem('jwt', jwt);
-        console.log(localStorage)
         setLoggedIn(true);
         history.push('/');
     })
@@ -97,7 +77,7 @@ function App() {
 
   function handleCardLike(card) {
 
-    const isLiked = card.likes.some(i => i._id === currentUser._id);
+    const isLiked = card.likes.some(i => i === currentUser._id);
 
     api.changeLikeCardStatus(card._id, isLiked)
         .then((newCard) => {setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
@@ -108,7 +88,7 @@ function App() {
   }
 
   function handleCardDelete(card) {
-    const isOwn = card.owner._id === currentUser._id;
+    const isOwn = card.owner === currentUser._id;
     if(isOwn) {
       api.removeCard(card._id)
       .then(() => {setCards((state) => state.filter((c) => c._id !==  card._id));
@@ -188,11 +168,25 @@ function App() {
       })
   }
 
-  //useEffect 
+  // useEffect 
   
-  // useEffect(() => {
-  //   tokenCheck()
-  // }, []);
+  useEffect(() => {
+      const jwt = localStorage.getItem('jwt')
+  
+      if(!jwt) {
+        return;
+      } else {
+        userAuth.getContent()
+          .then((user) => {
+            setLoggedIn(true);
+            setUserData({email: user.email});
+            history.push('/');
+        })
+        .catch(() => {
+          console.log('Ошибка')
+        })
+      }
+  }, []);
 
   useEffect(() => {
     api.getInitialCards()
@@ -200,7 +194,7 @@ function App() {
         setCards(res)
     })
     .catch(() => {
-        console.log('Ошибка')
+        console.log('Ошибка');
     }
     )}, [loggedIn]
   );
@@ -210,10 +204,11 @@ function App() {
         .then((result) => {
             updateCurrentUser(result)
         })
-        .catch((e) => {
-            console.log(e)
+        .catch((err) => {
+          console.log(err);
         }
-    )}, [loggedIn]
+    )
+  }, [loggedIn]
   );
 
   return (

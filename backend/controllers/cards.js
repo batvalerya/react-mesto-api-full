@@ -58,7 +58,7 @@ const likeCard = async (req, res, next) => {
       { new: true },
     );
     if (card) {
-      res.status(OK).send({ likes: card.likes });
+      res.status(OK).send(card);
     } else {
       next(new NotFoundError(NOT_FOUND, 'Карточка с указанным id не найдена.'));
     }
@@ -79,7 +79,7 @@ const dislikeCard = async (req, res, next) => {
       { new: true },
     );
     if (card) {
-      res.status(OK).send({ likes: card.likes });
+      res.status(OK).send(card);
     } else {
       next(new NotFoundError(NOT_FOUND, 'Карточка с указанным id не найдена.'));
     }

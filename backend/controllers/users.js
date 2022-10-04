@@ -97,9 +97,11 @@ const getUsers = async (req, res, next) => {
 };
 
 const getUserInfo = async (req, res, next) => {
+  console.log(req.user._id)
   try {
     const user = await User.findById(req.user._id);
     res.status(OK).send(user);
+    console.log(user);
   } catch (err) {
     next(err);
   }
@@ -107,7 +109,7 @@ const getUserInfo = async (req, res, next) => {
 
 const updateAvatar = async (req, res, next) => {
   try {
-    const user = await User.findOneAndUpdate(
+    const user = await User.findByIdAndUpdate(
       req.user._id,
       { $set: { avatar: req.body.avatar } },
       {
@@ -141,9 +143,9 @@ const login = (req, res, next) => {
           if (isUserValid) {
             const token = jwt.sign({
               _id: user._id,
-            }, 'SECRET');
+            }, 'SECRET', { expiresIn: '7d' });
             res.cookie('jwt', token, {
-              maxAge: 3600000,
+              maxAge: 3600000 * 24 * 7,
               httpOnly: true,
               sameSite: true,
             });

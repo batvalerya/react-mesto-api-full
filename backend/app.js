@@ -1,12 +1,13 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 const cors = require('cors');
 const { errors, Joi, celebrate } = require('celebrate');
 const { cardRouter } = require('./routes/cards');
 const { NotFoundError } = require('./errors/NotFoundError');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-// const cors = require('./middlewares/cors');
 
 const { userRoutes } = require('./routes/users');
 
@@ -43,6 +44,7 @@ app.post('/signin', express.json(), celebrate({
 }), login);
 
 app.use(cookieParser());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(auth);
 app.use(userRoutes);
 app.use(cardRouter);
