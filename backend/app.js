@@ -20,11 +20,23 @@ const { PORT = 3000 } = process.env;
 const app = express();
 
 app.use(cors({
-  origin: ['http://localhost:3000'],
+  origin: [
+    'http://localhost:3000',
+    'http://api.mesto.baturina.nomore.nomoredomains.icu',
+    'https://api.mesto.baturina.nomore.nomoredomains.icu',
+    'http://mesto.baturina.nomoredomains.icu',
+    'https://mesto.baturina.nomoredomains.icu',
+  ],
   credentials: true,
 }));
 
 app.use(requestLogger);
+
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
 
 app.post('/signup', express.json(), celebrate({
   body: Joi.object().keys({
