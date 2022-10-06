@@ -6,6 +6,8 @@ const { BadRequestError } = require('../errors/BadRequestError');
 const { UnauthorizedError } = require('../errors/UnauthorizedError');
 const { ConflictError } = require('../errors/ConflictError');
 
+const { NODE_ENV, JWT_SECRET } = process.env;
+
 const OK = 200;
 const BAD_REQUEST = 400;
 const UNAUTHORIZED = 401;
@@ -97,11 +99,9 @@ const getUsers = async (req, res, next) => {
 };
 
 const getUserInfo = async (req, res, next) => {
-  console.log(req.user._id)
   try {
     const user = await User.findById(req.user._id);
     res.status(OK).send(user);
-    console.log(user);
   } catch (err) {
     next(err);
   }
@@ -141,9 +141,13 @@ const login = (req, res, next) => {
       bcrypt.compare(password, user.password)
         .then((isUserValid) => {
           if (isUserValid) {
-            const token = jwt.sign({
-              _id: user._id,
-            }, 'SECRET', { expiresIn: '7d' });
+            const token = jwt.sign(
+              {
+                _id: user._id,
+              },
+              NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+              { expiresIn: '7d' },
+            );
             res.cookie('jwt', token, {
               maxAge: 3600000 * 24 * 7,
               httpOnly: true,
