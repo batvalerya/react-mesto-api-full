@@ -60,10 +60,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(auth);
 app.use(userRoutes);
 app.use(cardRouter);
-app.use(errorLogger);
 app.use((req, res, next) => {
   next(new NotFoundError(404, 'Страница не найдена'));
 });
+app.use(errorLogger);
 app.use(errors());
 app.use(errorHandler);
 
